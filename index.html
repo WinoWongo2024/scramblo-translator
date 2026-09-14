@@ -1,54 +1,434 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Scramblo Translator</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/><style>:root{--bg:#0f1117;--bg-elevated:#171a23;--bg-input:#1c1f2b;--border:#2a2f3d;--text:#e8eaed;--text-muted:#9aa0b0;--accent:#5b8def;--success:#3dd68c;--radius:12px;--font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',monospace}[data-theme=light]{--bg:#f5f6fa;--bg-elevated:#fff;--bg-input:#f0f2f7;--border:#d8dce6;--text:#1a1d26;--text-muted:#5c6478;--accent:#3b6fd9}*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5}.app{max-width:960px;margin:0 auto;padding:1.25rem 1rem 3rem;display:flex;flex-direction:column;gap:1.25rem}header{display:flex;justify-content:space-between;align-items:center}.logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#5b8def,#8b5cf6);display:grid;place-items:center;font-weight:700;color:#fff}.mode-bar{display:flex;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:4px;gap:4px}.mode-btn{flex:1;padding:.65rem 1rem;border:none;border-radius:9px;background:transparent;color:var(--text-muted);font:600 .9rem var(--font);cursor:pointer}.mode-btn.active{background:var(--accent);color:#fff}.panels{display:grid;grid-template-columns:1fr;gap:1rem}@media(min-width:720px){.panels{grid-template-columns:1fr auto 1fr}}.panel{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;min-height:200px}.panel-header{display:flex;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid var(--border);background:var(--bg-input)}.panel-label{font-size:.75rem;font-weight:600;text-transform:uppercase;color:var(--text-muted)}.mini-btn{padding:.3rem .55rem;font-size:.75rem;border-radius:6px;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text-muted);cursor:pointer}.mini-btn:hover{border-color:var(--accent)}.mini-btn.copied{color:var(--success);border-color:var(--success)}textarea{flex:1;width:100%;min-height:150px;padding:1rem;border:none;background:transparent;color:var(--text);font:1.05rem/1.55 var(--font);resize:vertical;outline:none}#output{font-family:var(--mono)}.swap-btn{width:48px;height:48px;border-radius:50%;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text);cursor:pointer;display:grid;place-items:center}.swap-btn:hover{background:var(--accent);color:#fff}.controls{display:flex;gap:.65rem;align-items:center}.btn{padding:.7rem 1.25rem;border-radius:10px;border:none;font:600 .95rem var(--font);cursor:pointer}.btn-primary{background:var(--accent);color:#fff}.btn-secondary{background:var(--bg-elevated);color:var(--text);border:1px solid var(--border)}.stats{margin-left:auto;font-size:.8rem;color:var(--text-muted)}.section{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}.section-header{display:flex;justify-content:space-between;padding:.9rem 1.1rem;cursor:pointer;background:var(--bg-input)}.section-body{display:none;padding:1.1rem}.section.open .section-body{display:block}.examples-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.5rem}.example{padding:.5rem .7rem;background:var(--bg-input);border-radius:8px;border:1px solid var(--border);cursor:pointer;font-size:.88rem}.example:hover{border-color:var(--accent)}.history-list{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:.4rem}.history-item{padding:.6rem .8rem;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:.88rem}.history-item:hover{border-color:var(--accent)}.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg-elevated);border:1px solid var(--border);padding:.7rem 1.2rem;border-radius:10px;opacity:0;transition:all .3s;z-index:100}.toast.show{transform:translateX(-50%) translateY(0);opacity:1}footer{text-align:center;font-size:.8rem;color:var(--text-muted)}footer a{color:var(--accent)}</style></head><body><div class="app"><header><div style="display:flex;align-items:center;gap:.75rem"><div class="logo">Sc</div><div><h1 style="font-size:1.35rem;margin:0">Scramblo Translator</h1><div style="font-size:.8rem;color:var(--text-muted)">Deterministic constructed language</div></div></div><button class="mini-btn" id="themeToggle">Theme</button></header><div class="mode-bar"><button class="mode-btn active" id="modeEnToScr">English → Scramblo</button><button class="mode-btn" id="modeScrToEn">Scramblo → English</button></div><div class="panels"><div class="panel"><div class="panel-header"><span class="panel-label" id="inputLabel">English</span><div><button class="mini-btn" id="speakInput">Speak</button> <button class="mini-btn" id="clearInput">Clear</button></div></div><textarea id="input" placeholder="Type or paste text here…"></textarea></div><div style="display:flex;align-items:center;justify-content:center"><button class="swap-btn" id="swapBtn">⇄</button></div><div class="panel"><div class="panel-header"><span class="panel-label" id="outputLabel">Scramblo</span><div><button class="mini-btn" id="speakOutput">Speak</button> <button class="mini-btn" id="copyOutput">Copy</button></div></div><textarea id="output" readonly placeholder="Translation appears here…"></textarea></div></div><div class="controls"><button class="btn btn-primary" id="translateBtn">Translate</button><button class="btn btn-secondary" id="clearAll">Clear all</button><div class="stats" id="stats">0 characters · 0 words</div></div><div class="section open" id="historySection"><div class="section-header" data-toggle="historySection"><span>History</span><span>▼</span></div><div class="section-body"><button class="mini-btn" id="clearHistory">Clear history</button><div class="history-list" id="historyList"><div style="text-align:center;color:var(--text-muted);padding:1rem">No translations yet.</div></div></div></div><div class="section" id="examplesSection"><div class="section-header" data-toggle="examplesSection"><span>Examples</span><span>▼</span></div><div class="section-body"><div class="examples-grid" id="examplesGrid"></div></div></div><div class="section" id="rulesSection"><div class="section-header" data-toggle="rulesSection"><span>Language Rules</span><span>▼</span></div><div class="section-body"><div id="rulesContent"></div></div></div><footer>Scramblo Translator · <a href="https://github.com/WinoWongo2024/scramblo-translator">GitHub</a></footer></div><div class="toast" id="toast"></div><script>
-const LANGUAGE_NAME="Scramblo";
-const SCRAMBLE_RULES={3:[1,3,2],4:[4,2,3,1],5:[5,4,2,1,3],6:[6,2,4,1,5,3],7:[7,3,5,1,6,2,4],8:[8,2,3,4,5,6,7,1],9:[9,2,4,6,8,1,3,5,7],10:[10,2,4,6,8,1,3,5,7,9]};
-function generateLongRule(n){if(n<3)return null;if(SCRAMBLE_RULES[n])return SCRAMBLE_RULES[n];const r=[n];for(let i=2;i<=n;i+=2)if(i!==n)r.push(i);for(let i=1;i<=n;i+=2)if(i!==n)r.push(i);return r;}
-function getRule(n){if(n<3)return null;return SCRAMBLE_RULES[n]||generateLongRule(n);}
-const COMPRESS_MAP={"aa":"â","ee":"ê","ii":"î","oo":"ô","uu":"û","ss":"ß","ll":"ł","tt":"ŧ","dd":"đ","nn":"ń","mm":"ṃ","rr":"ř","ff":"ƒ","gg":"ǥ","bb":"ƀ","zz":"ž","cc":"č","hh":"ħ","kk":"ķ","pp":"ƥ"};
-const EXPAND_MAP=Object.fromEntries(Object.entries(COMPRESS_MAP).map(([k,v])=>[v,k]));
-function scrambleWord(letters,length){const rule=getRule(length);if(!rule)return letters;return rule.map(pos=>letters[pos-1]);}
-function unscrambleWord(letters,length){const rule=getRule(length);if(!rule)return letters;const result=new Array(length);rule.forEach((srcPos,i)=>{result[srcPos-1]=letters[i]});return result;}
-function compressRepeats(str){let result="",i=0,lower=str.toLowerCase();while(i<lower.length){const ch=lower[i];let run=1;while(i+run<lower.length&&lower[i+run]===ch)run++;if(run>=2){const pair=ch+ch,special=COMPRESS_MAP[pair];if(special){let remaining=run;while(remaining>=2){result+=special;remaining-=2}if(remaining===1)result+=ch;}else result+=ch.repeat(run);}else result+=ch;i+=run;}return result;}
-function expandSpecials(str){let result="";for(const ch of str)result+=EXPAND_MAP[ch]||ch;return result;}
-function isLetter(ch){return /[a-zA-ZÀ-ÿ]/.test(ch);}
-function splitWordAndPunct(token){let start=0;while(start<token.length&&!isLetter(token[start])&&token[start]!=="'"&&token[start]!=="’"&&token[start]!=="-")start++;let end=token.length;while(end>start&&!isLetter(token[end-1])&&token[end-1]!=="'"&&token[end-1]!=="’"&&token[end-1]!=="-")end--;return{prefix:token.slice(0,start),core:token.slice(start,end),suffix:token.slice(end)};}
-function extractLetters(core){return[...core].filter(isLetter);}
-function capitalizeFirst(str){if(!str)return str;const first=str[0],rest=str.slice(1).toLowerCase();const upper={"â":"Â","ê":"Ê","î":"Î","ô":"Ô","û":"Û","ß":"ẞ","ł":"Ł","ŧ":"Ŧ","đ":"Đ","ń":"Ń","ṃ":"Ṃ","ř":"Ř","ƒ":"Ƒ","ǥ":"Ǥ","ƀ":"Ƀ","ž":"Ž","č":"Č","ħ":"Ħ","ķ":"Ķ","ƥ":"Ƥ"};return (upper[first]||first.toUpperCase())+rest;}
-function translateWordEnToScr(word){if(!word)return word;if(/^[\d\W]+$/.test(word)&&!/[a-zA-Z]/.test(word))return word;const{prefix,core,suffix}=splitWordAndPunct(word);if(!core)return word;const letters=extractLetters(core),len=letters.length;if(len<3)return prefix+capitalizeFirst(core)+suffix;const lower=letters.map(c=>c.toLowerCase());const scrambled=scrambleWord(lower,len);const compressed=compressRepeats(scrambled.join(""));return prefix+capitalizeFirst(compressed)+suffix;}
-function translateWordScrToEn(word){if(!word)return word;const{prefix,core,suffix}=splitWordAndPunct(word);if(!core)return word;const expanded=expandSpecials(core.toLowerCase());const letters=extractLetters(expanded),len=letters.length;if(len<3||!getRule(len))return prefix+capitalizeFirst(expanded)+suffix;const unscrambled=unscrambleWord(letters,len).join("");return prefix+capitalizeFirst(unscrambled)+suffix;}
-function isQuestion(text){return /\?\s*$/.test(text.trim());}
-function translateText(text,direction){if(!text.trim())return{result:""};const lines=text.split(/\n/);const out=lines.map(line=>{const parts=line.split(/(\s+)/);return parts.map(p=>{if(/^\s+$/.test(p)||p==="")return p;return direction==="en2scr"?translateWordEnToScr(p):translateWordScrToEn(p);}).join("");});let result=out.join("\n");if(direction==="en2scr"&&isQuestion(text)){result=result.replace(/^¿\s*/,"");result="¿"+result;}if(direction==="scr2en")result=result.replace(/^¿\s*/,"");return{result};}
-const HISTORY_KEY="scramblo-history",MAX_HISTORY=40;
-function loadHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]")}catch{return[]}}
-function saveHistory(items){localStorage.setItem(HISTORY_KEY,JSON.stringify(items.slice(0,MAX_HISTORY)));}
-function addToHistory(input,output,direction){if(!input.trim()||!output.trim())return;let items=loadHistory();if(items[0]&&items[0].input===input&&items[0].direction===direction)return;items.unshift({input,output,direction,ts:Date.now()});saveHistory(items);renderHistory();}
-function clearHistory(){localStorage.removeItem(HISTORY_KEY);renderHistory();showToast("History cleared");}
-function formatTime(ts){const d=new Date(ts),diff=(Date.now()-d)/1000;if(diff<60)return"just now";if(diff<3600)return Math.floor(diff/60)+"m ago";if(diff<86400)return Math.floor(diff/3600)+"h ago";return d.toLocaleDateString(undefined,{month:"short",day:"numeric"});}
-function escapeHtml(s){return String(s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""");}
-function renderHistory(){const list=$("historyList"),items=loadHistory();if(!items.length){list.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:1rem">No translations yet.</div>';return;}list.innerHTML=items.map((item,idx)=>{const dir=item.direction==="en2scr"?"EN→SC":"SC→EN";const en=item.direction==="en2scr"?item.input:item.output;const scr=item.direction==="en2scr"?item.output:item.input;return `<div class="history-item" data-idx="${idx}"><div>${escapeHtml(en)}</div><div style="font-family:var(--mono)">${escapeHtml(scr)}</div><div style="font-size:.72rem;color:var(--text-muted)">${dir} · ${formatTime(item.ts)}</div></div>`;}).join("");list.querySelectorAll(".history-item").forEach(el=>{el.addEventListener("click",()=>{const item=items[+el.dataset.idx];direction=item.direction;updateLabels();$("input").value=item.input;$("output").value=item.output;updateStats();showToast("Restored");});});}
-function speak(text,btn){if(!window.speechSynthesis||!text.trim())return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=0.9;const voices=window.speechSynthesis.getVoices();const en=voices.find(v=>v.lang.startsWith("en"));if(en)u.voice=en;if(btn){u.onstart=()=>btn.classList.add("copied");u.onend=()=>btn.classList.remove("copied");}window.speechSynthesis.speak(u);}
-let direction="en2scr";const $=id=>document.getElementById(id);
-function updateLabels(){if(direction==="en2scr"){$("inputLabel").textContent="English";$("outputLabel").textContent=LANGUAGE_NAME;$("modeEnToScr").classList.add("active");$("modeScrToEn").classList.remove("active");}else{$("inputLabel").textContent=LANGUAGE_NAME;$("outputLabel").textContent="English";$("modeScrToEn").classList.add("active");$("modeEnToScr").classList.remove("active");}}
-function doTranslate(add=true){const input=$("input").value;const{result}=translateText(input,direction);$("output").value=result;updateStats();if(add&&input.trim()&&result.trim())addToHistory(input,result,direction);}
-function updateStats(){const t=$("input").value;const c=t.length;const w=t.trim()?t.trim().split(/\s+/).length:0;$("stats").textContent=c+" character"+(c!==1?"s":"")+" · "+w+" word"+(w!==1?"s":"");}
-function showToast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2000);}
-function copyOutput(){const text=$("output").value;if(!text)return;navigator.clipboard.writeText(text).then(()=>{const b=$("copyOutput");b.classList.add("copied");b.textContent="Copied!";showToast("Copied");setTimeout(()=>{b.classList.remove("copied");b.textContent="Copy"},1500);});}
-function populateExamples(){const grid=$("examplesGrid");["Hello","How are you?","Time","Food","Computer","Telephone","Friend","Family","International","Communication"].forEach(en=>{const{result}=translateText(en,"en2scr");const el=document.createElement("div");el.className="example";el.innerHTML=`<span style="color:var(--text-muted)">${en}</span> → <span style="font-family:var(--mono)">${result}</span>`;el.onclick=()=>{direction="en2scr";updateLabels();$("input").value=en;doTranslate(false);};grid.appendChild(el);});}
-function populateRules(){const el=$("rulesContent");let html="<h4>Scrambling (3–10 fixed, 11+ generated)</h4><ul>";[3,4,5,6,7,8,9,10,11,12].forEach(n=>{html+=`<li>${n}: ${getRule(n).join("-")}</li>`;});html+="</ul><h4>Compression</h4><ul>";Object.entries(COMPRESS_MAP).forEach(([k,v])=>{html+=`<li>${k} → ${v}</li>`;});html+="</ul>";el.innerHTML=html;}
-document.querySelectorAll("[data-toggle]").forEach(h=>h.addEventListener("click",()=>$(h.getAttribute("data-toggle")).classList.toggle("open")));
-$("modeEnToScr").onclick=()=>{if(direction==="en2scr")return;$("input").value=$("output").value;$("output").value="";direction="en2scr";updateLabels();doTranslate(false);};
-$("modeScrToEn").onclick=()=>{if(direction==="scr2en")return;$("input").value=$("output").value||$("input").value;$("output").value="";direction="scr2en";updateLabels();doTranslate(false);};
-$("swapBtn").onclick=()=>{const i=$("input").value,o=$("output").value;$("input").value=o;$("output").value=i;direction=direction==="en2scr"?"scr2en":"en2scr";updateLabels();doTranslate(false);};
-$("translateBtn").onclick=()=>doTranslate(true);
-$("input").oninput=()=>{updateStats();doTranslate(false);};
-$("input").onblur=()=>{if($("input").value.trim()&&$("output").value.trim())addToHistory($("input").value,$("output").value,direction);};
-$("clearInput").onclick=()=>{$("input").value="";$("output").value="";updateStats();};
-$("clearAll").onclick=()=>{$("input").value="";$("output").value="";updateStats();};
-$("copyOutput").onclick=copyOutput;
-$("themeToggle").onclick=()=>{const isLight=document.documentElement.getAttribute("data-theme")==="light";if(isLight){document.documentElement.removeAttribute("data-theme");localStorage.setItem("scramblo-theme","dark");}else{document.documentElement.setAttribute("data-theme","light");localStorage.setItem("scramblo-theme","light");}};
-$("clearHistory").onclick=clearHistory;
-$("speakInput").onclick=()=>speak($("input").value,$("speakInput"));
-$("speakOutput").onclick=()=>speak($("output").value,$("speakOutput"));
-if(localStorage.getItem("scramblo-theme")==="light")document.documentElement.setAttribute("data-theme","light");
-populateExamples();populateRules();updateLabels();updateStats();renderHistory();
-if(window.speechSynthesis)window.speechSynthesis.getVoices();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scramblo Translator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--bg-elevated:#171a23;--bg-input:#1c1f2b;--border:#2a2f3d;--text:#e8eaed;--text-muted:#9aa0b0;--accent:#5b8def;--success:#3dd68c;--radius:12px;--font:Inter,system-ui,sans-serif;--mono:JetBrains Mono,monospace}
+[data-theme=light]{--bg:#f5f6fa;--bg-elevated:#fff;--bg-input:#f0f2f7;--border:#d8dce6;--text:#1a1d26;--text-muted:#5c6478;--accent:#3b6fd9}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+.app{max-width:960px;margin:0 auto;padding:1.25rem 1rem 3rem;display:flex;flex-direction:column;gap:1.25rem}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+.logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#5b8def,#8b5cf6);display:grid;place-items:center;font-weight:700;color:#fff}
+.mode-bar{display:flex;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:4px;gap:4px}
+.mode-btn{flex:1;padding:.65rem 1rem;border:none;border-radius:9px;background:transparent;color:var(--text-muted);font:600 .9rem var(--font);cursor:pointer}
+.mode-btn.active{background:var(--accent);color:#fff}
+.panels{display:grid;grid-template-columns:1fr;gap:1rem}
+@media(min-width:720px){.panels{grid-template-columns:1fr auto 1fr}}
+.panel{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;min-height:200px}
+.panel-header{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;border-bottom:1px solid var(--border);background:var(--bg-input)}
+.panel-label{font-size:.75rem;font-weight:600;text-transform:uppercase;color:var(--text-muted)}
+.mini-btn{padding:.3rem .55rem;font-size:.75rem;border-radius:6px;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text-muted);cursor:pointer;font-family:var(--font)}
+.mini-btn:hover{border-color:var(--accent);color:var(--text)}
+.mini-btn.copied{color:var(--success);border-color:var(--success)}
+textarea{flex:1;width:100%;min-height:150px;padding:1rem;border:none;background:transparent;color:var(--text);font:1.05rem/1.55 var(--font);resize:vertical;outline:none}
+#output{font-family:var(--mono)}
+.swap-btn{width:48px;height:48px;border-radius:50%;border:1px solid var(--border);background:var(--bg-elevated);color:var(--text);cursor:pointer;font-size:1.2rem}
+.swap-btn:hover{background:var(--accent);color:#fff}
+.controls{display:flex;flex-wrap:wrap;gap:.65rem;align-items:center}
+.btn{padding:.7rem 1.25rem;border-radius:10px;border:none;font:600 .95rem var(--font);cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-secondary{background:var(--bg-elevated);color:var(--text);border:1px solid var(--border)}
+.stats{margin-left:auto;font-size:.8rem;color:var(--text-muted)}
+.section{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.section-header{display:flex;justify-content:space-between;padding:.9rem 1.1rem;cursor:pointer;background:var(--bg-input);user-select:none}
+.section-body{display:none;padding:1.1rem}.section.open .section-body{display:block}
+.examples-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.5rem}
+.example{padding:.5rem .7rem;background:var(--bg-input);border-radius:8px;border:1px solid var(--border);cursor:pointer;font-size:.88rem}
+.example:hover{border-color:var(--accent)}
+.history-list{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:.4rem}
+.history-item{padding:.6rem .8rem;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:.88rem}
+.history-item:hover{border-color:var(--accent)}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg-elevated);border:1px solid var(--border);padding:.7rem 1.2rem;border-radius:10px;opacity:0;transition:all .3s;z-index:100;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+footer{text-align:center;font-size:.8rem;color:var(--text-muted)}footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<div style="display:flex;align-items:center;gap:.75rem">
+<div class="logo">Sc</div>
+<div><h1 style="font-size:1.35rem;margin:0">Scramblo Translator</h1>
+<div style="font-size:.8rem;color:var(--text-muted)">Deterministic constructed language</div></div>
+</div>
+<button class="mini-btn" id="themeToggle">Theme</button>
+</header>
+
+<div class="mode-bar">
+<button class="mode-btn active" id="modeEnToScr">English → Scramblo</button>
+<button class="mode-btn" id="modeScrToEn">Scramblo → English</button>
+</div>
+
+<div class="panels">
+<div class="panel">
+<div class="panel-header">
+<span class="panel-label" id="inputLabel">English</span>
+<div>
+<button class="mini-btn" id="speakInput">Speak</button>
+<button class="mini-btn" id="clearInput">Clear</button>
+</div>
+</div>
+<textarea id="input" placeholder="Type or paste text here…"></textarea>
+</div>
+<div style="display:flex;align-items:center;justify-content:center">
+<button class="swap-btn" id="swapBtn" title="Swap">⇄</button>
+</div>
+<div class="panel">
+<div class="panel-header">
+<span class="panel-label" id="outputLabel">Scramblo</span>
+<div>
+<button class="mini-btn" id="speakOutput">Speak</button>
+<button class="mini-btn" id="copyOutput">Copy</button>
+</div>
+</div>
+<textarea id="output" readonly placeholder="Translation appears here…"></textarea>
+</div>
+</div>
+
+<div class="controls">
+<button class="btn btn-primary" id="translateBtn">Translate</button>
+<button class="btn btn-secondary" id="clearAll">Clear all</button>
+<div class="stats" id="stats">0 characters · 0 words</div>
+</div>
+
+<div class="section open" id="historySection">
+<div class="section-header" data-toggle="historySection"><span>History</span><span>▼</span></div>
+<div class="section-body">
+<button class="mini-btn" id="clearHistory" style="margin-bottom:.75rem">Clear history</button>
+<div class="history-list" id="historyList"><div style="text-align:center;color:var(--text-muted);padding:1rem">No translations yet.</div></div>
+</div>
+</div>
+
+<div class="section" id="examplesSection">
+<div class="section-header" data-toggle="examplesSection"><span>Examples</span><span>▼</span></div>
+<div class="section-body"><div class="examples-grid" id="examplesGrid"></div></div>
+</div>
+
+<div class="section" id="rulesSection">
+<div class="section-header" data-toggle="rulesSection"><span>Language Rules</span><span>▼</span></div>
+<div class="section-body"><div id="rulesContent"></div></div>
+</div>
+
+<footer>Scramblo Translator · <a href="https://github.com/WinoWongo2024/scramblo-translator">GitHub</a></footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LANGUAGE_NAME = "Scramblo";
+const SCRAMBLE_RULES = {
+  3:[1,3,2], 4:[4,2,3,1], 5:[5,4,2,1,3], 6:[6,2,4,1,5,3],
+  7:[7,3,5,1,6,2,4], 8:[8,2,3,4,5,6,7,1], 9:[9,2,4,6,8,1,3,5,7], 10:[10,2,4,6,8,1,3,5,7,9]
+};
+function generateLongRule(n) {
+  if (n < 3) return null;
+  if (SCRAMBLE_RULES[n]) return SCRAMBLE_RULES[n];
+  const r = [n];
+  for (let i = 2; i <= n; i += 2) if (i !== n) r.push(i);
+  for (let i = 1; i <= n; i += 2) if (i !== n) r.push(i);
+  return r;
+}
+function getRule(n) { return n < 3 ? null : (SCRAMBLE_RULES[n] || generateLongRule(n)); }
+
+const COMPRESS_MAP = {
+  "aa":"\u00e2", "ee":"\u00ea", "ii":"\u00ee", "oo":"\u00f4", "uu":"\u00fb",
+  "ss":"\u00df", "ll":"\u0142",
+  "tt":"\u0167", "dd":"\u0111", "nn":"\u0144", "mm":"\u1e43", "rr":"\u0159",
+  "ff":"\u0192", "gg":"\u01e5", "bb":"\u0180", "zz":"\u017e", "cc":"\u010d",
+  "hh":"\u0127", "kk":"\u0137", "pp":"\u01a5"
+};
+const EXPAND_MAP = Object.fromEntries(Object.entries(COMPRESS_MAP).map(([k,v]) => [v,k]));
+
+function scrambleWord(letters, length) {
+  const rule = getRule(length);
+  if (!rule) return letters;
+  return rule.map(pos => letters[pos - 1]);
+}
+function unscrambleWord(letters, length) {
+  const rule = getRule(length);
+  if (!rule) return letters;
+  const result = new Array(length);
+  rule.forEach((srcPos, i) => { result[srcPos - 1] = letters[i]; });
+  return result;
+}
+function compressRepeats(str) {
+  let result = "", i = 0, lower = str.toLowerCase();
+  while (i < lower.length) {
+    const ch = lower[i];
+    let run = 1;
+    while (i + run < lower.length && lower[i + run] === ch) run++;
+    if (run >= 2) {
+      const special = COMPRESS_MAP[ch + ch];
+      if (special) {
+        let remaining = run;
+        while (remaining >= 2) { result += special; remaining -= 2; }
+        if (remaining === 1) result += ch;
+      } else result += ch.repeat(run);
+    } else result += ch;
+    i += run;
+  }
+  return result;
+}
+function expandSpecials(str) {
+  let result = "";
+  for (const ch of str) result += EXPAND_MAP[ch] || ch;
+  return result;
+}
+function isLetter(ch) { return /[a-zA-Z\u00c0-\u00ff]/.test(ch); }
+function splitWordAndPunct(token) {
+  let start = 0;
+  while (start < token.length && !isLetter(token[start]) && token[start] !== "'" && token[start] !== "\u2019" && token[start] !== "-") start++;
+  let end = token.length;
+  while (end > start && !isLetter(token[end-1]) && token[end-1] !== "'" && token[end-1] !== "\u2019" && token[end-1] !== "-") end--;
+  return { prefix: token.slice(0, start), core: token.slice(start, end), suffix: token.slice(end) };
+}
+function extractLetters(core) { return [...core].filter(isLetter); }
+function capitalizeFirst(str) {
+  if (!str) return str;
+  const first = str[0], rest = str.slice(1).toLowerCase();
+  const upper = {
+    "\u00e2":"\u00c2", "\u00ea":"\u00ca", "\u00ee":"\u00ce", "\u00f4":"\u00d4", "\u00fb":"\u00db",
+    "\u00df":"\u1e9e", "\u0142":"\u0141", "\u0167":"\u0166", "\u0111":"\u0110", "\u0144":"\u0143",
+    "\u1e43":"\u1e42", "\u0159":"\u0158", "\u0192":"\u0191", "\u01e5":"\u01e4", "\u0180":"\u0243",
+    "\u017e":"\u017d", "\u010d":"\u010c", "\u0127":"\u0126", "\u0137":"\u0136", "\u01a5":"\u01a4"
+  };
+  return (upper[first] || first.toUpperCase()) + rest;
+}
+
+function translateWordEnToScr(word) {
+  if (!word) return word;
+  if (/^[\d\W]+$/.test(word) && !/[a-zA-Z]/.test(word)) return word;
+  const { prefix, core, suffix } = splitWordAndPunct(word);
+  if (!core) return word;
+  const letters = extractLetters(core), len = letters.length;
+  if (len < 3) return prefix + capitalizeFirst(core) + suffix;
+  const lower = letters.map(c => c.toLowerCase());
+  const scrambled = scrambleWord(lower, len);
+  const compressed = compressRepeats(scrambled.join(""));
+  return prefix + capitalizeFirst(compressed) + suffix;
+}
+function translateWordScrToEn(word) {
+  if (!word) return word;
+  const { prefix, core, suffix } = splitWordAndPunct(word);
+  if (!core) return word;
+  const expanded = expandSpecials(core.toLowerCase());
+  const letters = extractLetters(expanded), len = letters.length;
+  if (len < 3 || !getRule(len)) return prefix + capitalizeFirst(expanded) + suffix;
+  const unscrambled = unscrambleWord(letters, len).join("");
+  return prefix + capitalizeFirst(unscrambled) + suffix;
+}
+function isQuestion(text) { return /\?\s*$/.test(text.trim()); }
+function translateText(text, direction) {
+  if (!text.trim()) return { result: "" };
+  const lines = text.split(/\n/);
+  const out = lines.map(line => {
+    const parts = line.split(/(\s+)/);
+    return parts.map(p => {
+      if (/^\s+$/.test(p) || p === "") return p;
+      return direction === "en2scr" ? translateWordEnToScr(p) : translateWordScrToEn(p);
+    }).join("");
+  });
+  let result = out.join("\n");
+  if (direction === "en2scr" && isQuestion(text)) {
+    result = result.replace(/^\u00bf\s*/, "");
+    result = "\u00bf" + result;
+  }
+  if (direction === "scr2en") result = result.replace(/^\u00bf\s*/, "");
+  return { result };
+}
+
+const HISTORY_KEY = "scramblo-history", MAX_HISTORY = 40;
+function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch { return []; } }
+function saveHistory(items) { localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, MAX_HISTORY))); }
+function addToHistory(input, output, direction) {
+  if (!input.trim() || !output.trim()) return;
+  let items = loadHistory();
+  if (items[0] && items[0].input === input && items[0].direction === direction) return;
+  items.unshift({ input, output, direction, ts: Date.now() });
+  saveHistory(items);
+  renderHistory();
+}
+function clearHistory() { localStorage.removeItem(HISTORY_KEY); renderHistory(); showToast("History cleared"); }
+function formatTime(ts) {
+  const diff = (Date.now() - ts) / 1000;
+  if (diff < 60) return "just now";
+  if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+  if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+  return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+function escapeHtml(s) {
+  return String(s).replace(/&/g, "\u0026amp;").replace(/</g, "\u0026lt;").replace(/>/g, "\u0026gt;").replace(/"/g, "\u0026quot;");
+}
+function renderHistory() {
+  const list = $("historyList"), items = loadHistory();
+  if (!items.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:1rem">No translations yet.</div>';
+    return;
+  }
+  list.innerHTML = items.map((item, idx) => {
+    const dir = item.direction === "en2scr" ? "EN\u2192SC" : "SC\u2192EN";
+    const en = item.direction === "en2scr" ? item.input : item.output;
+    const scr = item.direction === "en2scr" ? item.output : item.input;
+    return '<div class="history-item" data-idx="' + idx + '"><div>' + escapeHtml(en) + '</div><div style="font-family:var(--mono)">' + escapeHtml(scr) + '</div><div style="font-size:.72rem;color:var(--text-muted)">' + dir + ' \u00b7 ' + formatTime(item.ts) + '</div></div>';
+  }).join("");
+  list.querySelectorAll(".history-item").forEach(el => {
+    el.addEventListener("click", () => {
+      const item = items[+el.dataset.idx];
+      direction = item.direction;
+      updateLabels();
+      $("input").value = item.input;
+      $("output").value = item.output;
+      updateStats();
+      showToast("Restored");
+    });
+  });
+}
+
+function speak(text, btn) {
+  if (!window.speechSynthesis || !text.trim()) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.9;
+  const voices = window.speechSynthesis.getVoices();
+  const en = voices.find(v => v.lang.startsWith("en"));
+  if (en) u.voice = en;
+  if (btn) {
+    u.onstart = () => btn.classList.add("copied");
+    u.onend = () => btn.classList.remove("copied");
+  }
+  window.speechSynthesis.speak(u);
+}
+
+let direction = "en2scr";
+const $ = id => document.getElementById(id);
+
+function updateLabels() {
+  if (direction === "en2scr") {
+    $("inputLabel").textContent = "English";
+    $("outputLabel").textContent = LANGUAGE_NAME;
+    $("modeEnToScr").classList.add("active");
+    $("modeScrToEn").classList.remove("active");
+  } else {
+    $("inputLabel").textContent = LANGUAGE_NAME;
+    $("outputLabel").textContent = "English";
+    $("modeScrToEn").classList.add("active");
+    $("modeEnToScr").classList.remove("active");
+  }
+}
+function doTranslate(add = true) {
+  const input = $("input").value;
+  const { result } = translateText(input, direction);
+  $("output").value = result;
+  updateStats();
+  if (add && input.trim() && result.trim()) addToHistory(input, result, direction);
+}
+function updateStats() {
+  const t = $("input").value;
+  const c = t.length;
+  const w = t.trim() ? t.trim().split(/\s+/).length : 0;
+  $("stats").textContent = c + " character" + (c !== 1 ? "s" : "") + " \u00b7 " + w + " word" + (w !== 1 ? "s" : "");
+}
+function showToast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+function copyOutput() {
+  const text = $("output").value;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const b = $("copyOutput");
+    b.classList.add("copied");
+    b.textContent = "Copied!";
+    showToast("Copied");
+    setTimeout(() => { b.classList.remove("copied"); b.textContent = "Copy"; }, 1500);
+  });
+}
+
+function populateExamples() {
+  const grid = $("examplesGrid");
+  ["Hello", "How are you?", "Time", "Food", "Computer", "Telephone", "Friend", "Family", "International", "Communication"].forEach(en => {
+    const { result } = translateText(en, "en2scr");
+    const el = document.createElement("div");
+    el.className = "example";
+    el.innerHTML = '<span style="color:var(--text-muted)">' + en + '</span> \u2192 <span style="font-family:var(--mono)">' + result + '</span>';
+    el.onclick = () => { direction = "en2scr"; updateLabels(); $("input").value = en; doTranslate(false); };
+    grid.appendChild(el);
+  });
+}
+function populateRules() {
+  let html = "<h4 style=\"margin-bottom:.5rem\">Scrambling</h4><ul style=\"font-family:var(--mono);font-size:.85rem;margin-bottom:1rem\">";
+  [3,4,5,6,7,8,9,10,11,12].forEach(n => { html += "<li>" + n + ": " + getRule(n).join("-") + "</li>"; });
+  html += "</ul><h4 style=\"margin-bottom:.5rem\">Compression (2 same letters)</h4><ul style=\"font-family:var(--mono);font-size:.85rem\">";
+  Object.entries(COMPRESS_MAP).forEach(([k,v]) => { html += "<li>" + k + " \u2192 " + v + "</li>"; });
+  html += "</ul>";
+  $("rulesContent").innerHTML = html;
+}
+
+document.querySelectorAll("[data-toggle]").forEach(h => {
+  h.addEventListener("click", () => $(h.getAttribute("data-toggle")).classList.toggle("open"));
+});
+
+$("modeEnToScr").onclick = () => {
+  if (direction === "en2scr") return;
+  $("input").value = $("output").value;
+  $("output").value = "";
+  direction = "en2scr";
+  updateLabels();
+  doTranslate(false);
+};
+$("modeScrToEn").onclick = () => {
+  if (direction === "scr2en") return;
+  $("input").value = $("output").value || $("input").value;
+  $("output").value = "";
+  direction = "scr2en";
+  updateLabels();
+  doTranslate(false);
+};
+$("swapBtn").onclick = () => {
+  const i = $("input").value, o = $("output").value;
+  $("input").value = o;
+  $("output").value = i;
+  direction = direction === "en2scr" ? "scr2en" : "en2scr";
+  updateLabels();
+  doTranslate(false);
+};
+$("translateBtn").onclick = () => doTranslate(true);
+$("input").oninput = () => { updateStats(); doTranslate(false); };
+$("input").onblur = () => {
+  if ($("input").value.trim() && $("output").value.trim())
+    addToHistory($("input").value, $("output").value, direction);
+};
+$("clearInput").onclick = () => { $("input").value = ""; $("output").value = ""; updateStats(); };
+$("clearAll").onclick = () => { $("input").value = ""; $("output").value = ""; updateStats(); };
+$("copyOutput").onclick = copyOutput;
+$("themeToggle").onclick = () => {
+  const isLight = document.documentElement.getAttribute("data-theme") === "light";
+  if (isLight) {
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.setItem("scramblo-theme", "dark");
+  } else {
+    document.documentElement.setAttribute("data-theme", "light");
+    localStorage.setItem("scramblo-theme", "light");
+  }
+};
+$("clearHistory").onclick = clearHistory;
+$("speakInput").onclick = () => speak($("input").value, $("speakInput"));
+$("speakOutput").onclick = () => speak($("output").value, $("speakOutput"));
+
+if (localStorage.getItem("scramblo-theme") === "light")
+  document.documentElement.setAttribute("data-theme", "light");
+
+populateExamples();
+populateRules();
+updateLabels();
+updateStats();
+renderHistory();
+if (window.speechSynthesis) window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>
